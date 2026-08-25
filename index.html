@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Face Curse Games</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bungee+Shade&family=Rubik+Glitch&family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="top-bar">
+        <h1 class="logo">FACE CURSE GAMES</h1>
+        <p class="tagline">Stay chill. Or suffer the speed.</p>
+      </header>
+
+      <main id="screen-root"></main>
+
+      <aside id="webcam-panel" class="webcam-panel hidden">
+        <video id="webcam-preview" autoplay muted playsinline></video>
+        <div id="signal-status" class="signal-status"></div>
+      </aside>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
