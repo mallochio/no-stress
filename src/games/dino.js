@@ -13,6 +13,7 @@ export default {
       width: ctx.width,
       height: ctx.height,
       canvas: ctx.canvas,
+      global: false,
       background: [247, 247, 247],
       stretch: true,
       letterbox: true,
