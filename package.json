@@ -4,15 +4,20 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "doctor": "node scripts/doctor.mjs",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:client": "vite",
     "dev:server": "node server/index.js",
     "build": "vite build",
+    "start": "node server/index.js",
+    "play": "npm run build && npm start",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:stack": "node scripts/test-stack.mjs"
+    "test:stack": "node scripts/test-stack.mjs",
+    "verify": "npm run test:coverage && npm run build && npm run doctor"
   },
   "dependencies": {
     "@interhumanai/sdk": "^0.12.0",

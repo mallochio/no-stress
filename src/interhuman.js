@@ -3,7 +3,7 @@ import { StreamClient, StaticTokenProvider } from "@interhumanai/sdk";
 import { CURSE_SIGNALS } from "./constants.js";
 import { signalMonitor } from "./signalMonitor.js";
 
-const SEGMENT_MS = 2500;
+const SEGMENT_MS = 3000;
 
 /** @type {MediaStream | null} */
 let mediaStream = null;
@@ -17,7 +17,7 @@ let stream = null;
 /** @type {boolean} */
 let mockMode = false;
 
-/** @type {'no-camera' | 'no-api-key' | null} */
+/** @type {'no-camera' | 'connection-error' | null} */
 let mockReason = null;
 
 /** @type {number | null} */
@@ -58,6 +58,14 @@ function handleSignalDetected(event) {
       setStatus(`${type}: ${rationale.slice(0, 80)}…`);
     }
   }
+}
+
+/**
+ * @param {import("@interhumanai/sdk").StreamEventMap["signal.ended"]} event
+ */
+function handleSignalEnded(event) {
+  signalMonitor.handleSignalEnded(event.data.signal_type);
+  setStatus(`${event.data.signal_type} ended`);
 }
 
 /**
@@ -105,7 +113,7 @@ function startRecorder() {
 function startMockSignals(reason) {
   mockMode = true;
   mockReason = reason;
-  setStatus(reason === "no-camera" ? "No camera — mock signals" : "Mock mode — random curse triggers for demo");
+  setStatus(reason === "no-camera" ? "No camera — mock signals" : "Connection failed — mock signals");
 
   mockInterval = window.setInterval(() => {
     if (Math.random() < 0.35) {
@@ -126,6 +134,19 @@ export async function startInterhumanStream(preview) {
   let hasCamera = false;
   try {
     mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  } catch {
+    try {
+      mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      setStatus("Microphone unavailable — using camera only");
+    } catch (error) {
+      console.warn("Camera unavailable — continuing with mock signals", error);
+    }
+  }
+
+  try {
+    if (!mediaStream) {
+      throw new Error("No camera stream");
+    }
     preview.srcObject = mediaStream;
     await preview.play();
     hasCamera = true;
@@ -146,6 +167,8 @@ export async function startInterhumanStream(preview) {
     });
 
     stream.on("signal.detected", handleSignalDetected);
+    stream.on("signal.updated", handleSignalDetected);
+    stream.on("signal.ended", handleSignalEnded);
     stream.on("engagement.updated", handleEngagementUpdated);
     stream.on("error", (event) => {
       setStatus(`stream error: ${event.data.message ?? "unknown"}`);
@@ -159,7 +182,7 @@ export async function startInterhumanStream(preview) {
     mockReason = null;
   } catch (error) {
     console.warn(error);
-    startMockSignals("no-api-key");
+    startMockSignals("connection-error");
   }
 }
 
@@ -170,7 +193,9 @@ export async function stopInterhumanStream() {
   }
 
   if (recorder && recorder.state !== "inactive") {
+    const stopped = new Promise((resolve) => recorder?.addEventListener("stop", resolve, { once: true }));
     recorder.stop();
+    await stopped;
   }
   recorder = null;
 

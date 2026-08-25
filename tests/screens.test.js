@@ -73,8 +73,8 @@ describe("screens", () => {
     };
     renderPlayScreen(root, { game, curse: "stress", mockMode: true, mockReason: "no-camera", onQuit: vi.fn() });
     expect(root.innerHTML).toContain("DEMO MODE — no camera");
-    renderPlayScreen(root, { game, curse: "stress", mockMode: true, mockReason: "no-api-key", onQuit: vi.fn() });
-    expect(root.innerHTML).toContain("DEMO MODE — no API key");
+    renderPlayScreen(root, { game, curse: "stress", mockMode: true, mockReason: "connection-error", onQuit: vi.fn() });
+    expect(root.innerHTML).toContain("DEMO MODE — Interhuman unavailable");
     const live = renderPlayScreen(root, { game, curse: "stress", mockMode: false, mockReason: null, onQuit: vi.fn() });
     expect(root.innerHTML).not.toContain("mock-badge");
     expect(live.mount.id).toBe("game-mount");

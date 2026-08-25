@@ -91,7 +91,7 @@ export function renderCameraError(root, { message, onRetry, onBack }) {
 
 /**
  * @param {HTMLElement} root
- * @param {{ game: MiniGameDefinition; curse: CurseSignal; mockMode: boolean; mockReason: 'no-camera' | 'no-api-key' | null; onQuit: () => void }} opts
+ * @param {{ game: MiniGameDefinition; curse: CurseSignal; mockMode: boolean; mockReason: 'no-camera' | 'connection-error' | null; onQuit: () => void }} opts
  * @returns {{ mount: HTMLElement; scorePill: HTMLElement; boostPill: HTMLElement }}
  */
 export function renderPlayScreen(root, { game, curse, mockMode, mockReason, onQuit }) {
@@ -99,7 +99,7 @@ export function renderPlayScreen(root, { game, curse, mockMode, mockReason, onQu
     mockMode && mockReason === "no-camera"
       ? '<span class="mock-badge">DEMO MODE — no camera</span>'
       : mockMode
-        ? '<span class="mock-badge">DEMO MODE — no API key</span>'
+        ? '<span class="mock-badge">DEMO MODE — Interhuman unavailable</span>'
         : "";
   root.innerHTML = `
     <section class="screen play-layout">

@@ -20,13 +20,15 @@ export default {
       crisp: true,
     });
 
-    const { add, rect, circle, pos, area, anchor, onUpdate, fixed, text, z, rgb, vec2, loop, rand, dt, width, height } =
+    const { add, rect, circle, pos, area, anchor, onUpdate, fixed, text, z, rgb, vec2, rand, dt, width, height } =
       k;
 
     let score = 0;
     let alive = true;
     const PIPE_GAP = 150;
     const BASE_SPEED = 140;
+    const PIPE_SPACING = 300;
+    let spawnProgress = 0;
 
     const bird = add([
       circle(16),
@@ -83,13 +85,21 @@ export default {
       });
     }
 
-    loop(2.2, spawnPipe);
     spawnPipe();
 
     const scoreLabel = add([text("0", { size: 28 }), pos(16, 16), fixed(), z(100)]);
 
     onUpdate(() => {
       scoreLabel.text = String(score);
+      if (!alive) {
+        return;
+      }
+
+      spawnProgress += BASE_SPEED * ctx.getSpeedBoost() * dt();
+      if (spawnProgress >= PIPE_SPACING) {
+        spawnProgress = 0;
+        spawnPipe();
+      }
     });
 
     function die() {
@@ -113,6 +123,7 @@ export default {
       alive = true;
       bird.pos = vec2(90, height() / 2);
       bird.vy = 0;
+      spawnProgress = 0;
       ctx.onScore(0);
       k.get("pipe").forEach((pipe) => pipe.destroy());
       k.get("gameover").forEach((node) => node.destroy());

@@ -20,12 +20,14 @@ export default {
       crisp: true,
     });
 
-    const { add, rect, pos, area, anchor, onUpdate, fixed, text, z, rgb, vec2, loop, rand, dt, width, height } = k;
+    const { add, rect, pos, area, anchor, onUpdate, fixed, text, z, rgb, vec2, rand, dt, width, height } = k;
 
     const GROUND_Y = 170;
     const BASE_SPEED = 260;
     let alive = true;
     let distance = 0;
+    let spawnProgress = 0;
+    let nextSpawnDistance = rand(260, 390);
 
     add([rect(width(), 2), pos(0, GROUND_Y + 4), rgb(212, 212, 212), fixed(), z(-1)]);
 
@@ -84,19 +86,20 @@ export default {
       });
     }
 
-    loop(1.1, () => {
-      if (alive) {
-        spawnObstacle();
-      }
-    });
-
     const scoreLabel = add([text("0", { size: 18 }), pos(width() - 70, 12), fixed(), z(100)]);
 
     onUpdate(() => {
       if (!alive) {
         return;
       }
-      distance += BASE_SPEED * ctx.getSpeedBoost() * dt();
+      const step = BASE_SPEED * ctx.getSpeedBoost() * dt();
+      distance += step;
+      spawnProgress += step;
+      if (spawnProgress >= nextSpawnDistance) {
+        spawnProgress = 0;
+        nextSpawnDistance = rand(260, 390);
+        spawnObstacle();
+      }
       const score = Math.floor(distance / 8);
       scoreLabel.text = String(score);
       ctx.onScore(score);
@@ -121,6 +124,8 @@ export default {
     function reset() {
       alive = true;
       distance = 0;
+      spawnProgress = 0;
+      nextSpawnDistance = rand(260, 390);
       dino.pos = vec2(56, GROUND_Y - 36);
       dino.vy = 0;
       dino.grounded = true;

@@ -49,6 +49,13 @@ export class SignalMonitor {
     this.#emit();
   }
 
+  /** @param {import('./constants.js').CurseSignal} signalType */
+  handleSignalEnded(signalType) {
+    if (signalType === this.#curse) {
+      this.relax();
+    }
+  }
+
   /** @param {'engaged' | 'neutral' | 'disengaged'} state */
   handleEngagement(state) {
     if (this.#curse !== "disengagement") {
@@ -73,10 +80,6 @@ export class SignalMonitor {
   tick(dt) {
     const prevBoost = this.#boost;
     this.#boost = prevBoost + (this.#targetBoost - prevBoost) * Math.min(1, dt * 4);
-
-    if (!this.#triggered && this.#targetBoost > 1) {
-      this.#targetBoost = Math.max(1, this.#targetBoost - dt * 0.8);
-    }
 
     if (Math.abs(this.#boost - prevBoost) > 0.01) {
       this.#emit();
