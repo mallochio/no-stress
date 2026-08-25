@@ -67,6 +67,14 @@ describe("SignalMonitor", () => {
     expect(listener).toHaveBeenCalledWith(expect.objectContaining({ triggered: true }));
   });
 
+  it("relaxes only when the active curse signal ends", () => {
+    monitor.handleSignal("stress", "high");
+    monitor.handleSignalEnded("frustration");
+    expect(monitor.isTriggered()).toBe(true);
+    monitor.handleSignalEnded("stress");
+    expect(monitor.isTriggered()).toBe(false);
+  });
+
   it("decays target boost when no longer triggered", () => {
     monitor.handleSignal("stress", "high");
     monitor.tick(0.05);
